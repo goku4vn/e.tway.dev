@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learn English - Học Tiếng Anh Vui</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated background shapes */
+        .bg-shape {
+            position: absolute;
+            border-radius: 50%;
+            animation: float 20s ease-in-out infinite;
+            opacity: 0.1;
+        }
+
+        .bg-shape:nth-child(1) {
+            width: 200px;
+            height: 200px;
+            background: #ff6b6b;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .bg-shape:nth-child(2) {
+            width: 150px;
+            height: 150px;
+            background: #4ecdc4;
+            top: 70%;
+            right: 10%;
+            animation-delay: 5s;
+        }
+
+        .bg-shape:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            background: #ffe66d;
+            bottom: 10%;
+            left: 30%;
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            33% { transform: translateY(-30px) rotate(120deg); }
+            66% { transform: translateY(30px) rotate(240deg); }
+        }
+
+        .container {
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            z-index: 10;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .word-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .main-word {
+            font-size: 48px;
+            font-weight: bold;
+            color: #2d3436;
+            margin-bottom: 10px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .pronunciation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .ipa {
+            font-size: 20px;
+            color: #636e72;
+            font-style: italic;
+        }
+
+        .play-button {
+            background: linear-gradient(135deg, #ff6b6b, #ff8787);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .play-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .play-button:active {
+            transform: scale(0.95);
+        }
+
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-left: 18px solid white;
+            border-top: 12px solid transparent;
+            border-bottom: 12px solid transparent;
+            margin-left: 3px;
+        }
+
+        .vietnamese {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 4px solid #4ecdc4;
+        }
+
+        .vietnamese h3 {
+            color: #4ecdc4;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .vietnamese p {
+            font-size: 24px;
+            color: #2d3436;
+            font-weight: 600;
+        }
+
+        .image-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .word-image {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            border-radius: 20px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 100px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .examples {
+            background: #fff3e0;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 4px solid #ff9800;
+        }
+
+        .examples h3 {
+            color: #ff9800;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .example-item {
+            background: white;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #636e72;
+            border: 1px solid #ffe0b2;
+            transition: all 0.3s ease;
+        }
+
+        .example-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 10px rgba(255, 152, 0, 0.2);
+        }
+
+        .example-item strong {
+            color: #2d3436;
+        }
+
+        .related-words {
+            background: #e8f5e9;
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .related-words h3 {
+            color: #4caf50;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #4caf50;
+            border: 2px solid #4caf50;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .tag:hover {
+            background: #4caf50;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .hidden { display: none; }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #ffe5e5;
+            color: #d32f2f;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #ffcdd2;
+        }
+
+        .create-new-btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #4ecdc4, #44a3aa);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .create-new-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+
+            .main-word {
+                font-size: 36px;
+            }
+
+            .vietnamese p {
+                font-size: 20px;
+            }
+
+            .word-image {
+                width: 150px;
+                height: 150px;
+                font-size: 80px;
+            }
+        }
+
+        /* Fun decorative elements */
+        .decoration {
+            position: absolute;
+            pointer-events: none;
+        }
+
+        .star {
+            width: 30px;
+            height: 30px;
+            background: #ffe66d;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            position: absolute;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+
+        .star:nth-child(1) {
+            top: 20px;
+            right: 30px;
+            animation-delay: 0s;
+        }
+
+        .star:nth-child(2) {
+            bottom: 30px;
+            left: 20px;
+            animation-delay: 1s;
+            transform: scale(0.7);
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1) rotate(0deg); }
+            50% { opacity: 1; transform: scale(1.2) rotate(180deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated background shapes -->
+    <div class="bg-shape"></div>
+    <div class="bg-shape"></div>
+    <div class="bg-shape"></div>
+
+    <div class="container">
+        <!-- Decorative stars -->
+        <div class="star decoration"></div>
+        <div class="star decoration"></div>
+
+        <div id="app">
+            <!-- Loading state -->
+            <div class="loading hidden" id="loading">
+                <div class="loading-spinner"></div>
+                <p>Đang tải thông tin...</p>
+            </div>
+
+            <!-- Error state -->
+            <div class="error hidden" id="error">
+                <h2>😢 Không tìm thấy từ vựng</h2>
+                <p>Từ này chưa được tạo trong hệ thống</p>
+            </div>
+
+            <!-- Content -->
+            <div id="content">
+                <div class="header">
+                    <span class="word-badge">🌟 Từ vựng hôm nay</span>
+                    <h1 class="main-word" id="mainWord">Apple</h1>
+                    <div class="pronunciation">
+                        <span class="ipa" id="ipa">/ˈæp.əl/</span>
+                        <button class="play-button" type="button" aria-label="Phát âm từ" title="Phát âm từ" onclick="playSound(event)">
+                            <div class="play-icon"></div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="vietnamese">
+                    <h3>Tiếng Việt</h3>
+                    <p id="vietnamese">Quả táo</p>
+                </div>
+
+                <div class="image-container">
+                    <div class="word-image" id="wordImage">
+                        🍎
+                    </div>
+                </div>
+
+                <div class="examples">
+                    <h3>📝 Ví dụ</h3>
+                    <div id="examples">
+                        <div class="example-item">
+                            <strong>I eat an apple every day</strong><br>
+                            Tôi ăn một quả táo mỗi ngày
+                        </div>
+                        <div class="example-item">
+                            <strong>The apple is red and sweet</strong><br>
+                            Quả táo màu đỏ và ngọt
+                        </div>
+                    </div>
+                </div>
+
+                <div class="related-words">
+                    <h3>🔗 Từ liên quan</h3>
+                    <div class="tags" id="relatedWords">
+                        <span class="tag">fruit</span>
+                        <span class="tag">food</span>
+                        <span class="tag">healthy</span>
+                        <span class="tag">tree</span>
+                    </div>
+                </div>
+
+                <button class="create-new-btn" onclick="requestNewWord()">
+                    ✨ Yêu cầu thêm từ mới qua Telegram
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Config có thể ghi đè từ ngoài bằng window.APP_CONFIG
+        const APP_CONFIG = Object.assign({ r2BaseUrl: '' }, window.APP_CONFIG || {});
+
+        // Mock data structure - fallback khi không có API phù hợp
+        const mockData = {
+            'apple': {
+                word: 'Apple',
+                vietnamese: 'Quả táo',
+                ipa: '/ˈæp.əl/',
+                emoji: '🍎',
+                examples: [
+                    { en: 'I eat an apple every day', vi: 'Tôi ăn một quả táo mỗi ngày' },
+                    { en: 'The apple is red and sweet', vi: 'Quả táo màu đỏ và ngọt' }
+                ],
+                related: ['fruit', 'food', 'healthy', 'tree'],
+                audioUrl: null
+            },
+            'book': {
+                word: 'Book',
+                vietnamese: 'Quyển sách',
+                ipa: '/bʊk/',
+                emoji: '📚',
+                examples: [
+                    { en: 'I love reading books', vi: 'Tôi thích đọc sách' },
+                    { en: 'This book is interesting', vi: 'Quyển sách này thú vị' }
+                ],
+                related: ['read', 'library', 'story', 'learn'],
+                audioUrl: null
+            },
+            'cat': {
+                word: 'Cat',
+                vietnamese: 'Con mèo',
+                ipa: '/kæt/',
+                emoji: '🐱',
+                examples: [
+                    { en: 'The cat is sleeping', vi: 'Con mèo đang ngủ' },
+                    { en: 'I have a black cat', vi: 'Tôi có một con mèo đen' }
+                ],
+                related: ['pet', 'animal', 'kitten', 'meow'],
+                audioUrl: null
+            }
+        };
+
+        // Helpers
+        function getWordFromUrl() {
+            const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
+            if (path) return decodeURIComponent(path);
+            const hash = window.location.hash.slice(1);
+            return hash || 'apple';
+        }
+
+        function isMd5(id) {
+            return /^[a-f0-9]{32}$/i.test(id);
+        }
+
+        // Load word data (ưu tiên R2 nếu id là md5 và có cấu hình, fallback Dictionary API)
+        async function loadWordData(wordId) {
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const content = document.getElementById('content');
+
+            // Show loading
+            loading.classList.remove('hidden');
+            error.classList.add('hidden');
+            content.classList.add('hidden');
+
+            try {
+                let data = null;
+
+                if (isMd5(wordId) && APP_CONFIG.r2BaseUrl) {
+                    data = await fetchFromR2(wordId);
+                }
+
+                if (!data) {
+                    const word = wordId.replace(/\+/g, ' ').toLowerCase();
+                    data = await fetchFromDictionary(word);
+                }
+
+                if (!data) {
+                    data = mockData[wordId.toLowerCase()] || null;
+                }
+
+                if (data) {
+                    displayWordData(data);
+                    loading.classList.add('hidden');
+                    content.classList.remove('hidden');
+                } else {
+                    throw new Error('NOT_FOUND');
+                }
+            } catch (e) {
+                loading.classList.add('hidden');
+                error.classList.remove('hidden');
+            }
+        }
+
+        async function fetchFromR2(id) {
+            try {
+                const url = `${APP_CONFIG.r2BaseUrl.replace(/\/$/, '')}/words/${id}.json`;
+                const res = await fetch(url, { cache: 'no-cache' });
+                if (!res.ok) return null;
+                const json = await res.json();
+                return normalizeR2Word(json);
+            } catch (_) {
+                return null;
+            }
+        }
+
+        function normalizeR2Word(json) {
+            return {
+                word: json.word || '',
+                vietnamese: json.vietnamese || '',
+                ipa: json.ipa || '',
+                emoji: json.emoji || '🎯',
+                examples: Array.isArray(json.examples) ? json.examples : [],
+                related: Array.isArray(json.related) ? json.related : [],
+                audioUrl: json.audioUrl || null,
+                image: json.image || null
+            };
+        }
+
+        async function fetchFromDictionary(word) {
+            try {
+                const dictRes = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`);
+                if (!dictRes.ok) return null;
+                const dict = await dictRes.json();
+                const entry = Array.isArray(dict) ? dict[0] : null;
+                if (!entry) return null;
+
+                const ipa = (entry.phonetics || []).map(p => p.text).find(Boolean) || '';
+                const audioUrl = (entry.phonetics || []).map(p => p.audio).find(u => u && u.trim().length > 0) || null;
+
+                const examples = [];
+                const relatedSet = new Set();
+                (entry.meanings || []).forEach(m => {
+                    (m.definitions || []).forEach(d => {
+                        if (d.example && examples.length < 4) {
+                            examples.push({ en: d.example, vi: '' });
+                        }
+                        (d.synonyms || []).slice(0, 2).forEach(s => relatedSet.add(s));
+                    });
+                    (m.synonyms || []).slice(0, 2).forEach(s => relatedSet.add(s));
+                });
+
+                // Dịch nghĩa tiếng Việt (MyMemory API công khai)
+                const vietnamese = await translateToVi(entry.word || word);
+
+                // Dịch ví dụ sang VI (nhẹ, giới hạn 2)
+                for (let i = 0; i < Math.min(2, examples.length); i++) {
+                    examples[i].vi = await translateToVi(examples[i].en);
+                }
+
+                const related = Array.from(relatedSet).slice(0, 6);
+                const emoji = suggestEmoji(entry.word || word);
+
+                return {
+                    word: capitalize(entry.word || word),
+                    vietnamese,
+                    ipa: ipa || '',
+                    emoji,
+                    examples: examples.slice(0, 2),
+                    related: related.length ? related : defaultRelated(word),
+                    audioUrl
+                };
+            } catch (_) {
+                return null;
+            }
+        }
+
+        async function translateToVi(text) {
+            try {
+                const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|vi`;
+                const res = await fetch(url);
+                if (!res.ok) return '';
+                const json = await res.json();
+                const t = json?.responseData?.translatedText || '';
+                return t;
+            } catch (_) {
+                return '';
+            }
+        }
+
+        function suggestEmoji(word) {
+            const w = (word || '').toLowerCase();
+            if (w.includes('apple')) return '🍎';
+            if (w.includes('book')) return '📚';
+            if (w.includes('cat')) return '🐱';
+            if (w.includes('dog')) return '🐶';
+            if (w.includes('tree')) return '🌳';
+            return '🔤';
+        }
+
+        function defaultRelated(word) {
+            const w = (word || '').toLowerCase();
+            if (w.includes('apple')) return ['fruit', 'food', 'healthy', 'tree'];
+            if (w.includes('book')) return ['read', 'library', 'story', 'learn'];
+            if (w.includes('cat')) return ['pet', 'animal', 'kitten', 'meow'];
+            return ['learn', 'english', 'vocabulary'];
+        }
+
+        function capitalize(str) {
+            if (!str) return '';
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        // Display word data
+        function displayWordData(data) {
+            document.getElementById('mainWord').textContent = data.word;
+            document.getElementById('vietnamese').textContent = data.vietnamese;
+            document.getElementById('ipa').textContent = data.ipa;
+            document.getElementById('wordImage').textContent = data.emoji;
+
+            // Display examples
+            const examplesContainer = document.getElementById('examples');
+            examplesContainer.innerHTML = data.examples.map(ex => `
+                <div class="example-item">
+                    <strong>${ex.en}</strong><br>
+                    ${ex.vi}
+                </div>
+            `).join('');
+
+            // Display related words
+            const relatedContainer = document.getElementById('relatedWords');
+            relatedContainer.innerHTML = data.related.map(word => `
+                <span class="tag" onclick="navigateToWord('${word}')">${word}</span>
+            `).join('');
+        }
+
+        // Play sound function
+        async function playSound(event) {
+            const word = document.getElementById('mainWord').textContent;
+            const audioUrl = window.currentWordAudioUrl;
+            
+            try {
+                if (audioUrl) {
+                    const audio = new Audio(audioUrl);
+                    await audio.play();
+                } else if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(word);
+                    utterance.lang = 'en-US';
+                    utterance.rate = 0.8;
+                    speechSynthesis.speak(utterance);
+                }
+            } catch (_) {}
+
+            // Visual feedback
+            const button = event.currentTarget;
+            button.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                button.style.transform = '';
+            }, 200);
+        }
+
+        function navigateToWord(word) {
+            const path = '/' + encodeURIComponent(String(word).toLowerCase());
+            history.pushState({}, '', path);
+            loadWordData(String(word));
+        }
+
+        // Request new word
+        function requestNewWord() {
+            // In production, this would open Telegram
+            alert('🚀 Tính năng này sẽ mở Telegram bot để yêu cầu từ mới!\n\nTelegram: @YourVocabBot\nGõ: /new [từ cần tạo]');
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            const wordId = getWordFromUrl();
+            loadWordData(wordId);
+        });
+
+        // Handle hash changes
+        window.addEventListener('hashchange', () => {
+            const wordId = getWordFromUrl();
+            loadWordData(wordId);
+        });
+
+        // Handle back/forward
+        window.addEventListener('popstate', () => {
+            const wordId = getWordFromUrl();
+            loadWordData(wordId);
+        });
+
+        // Add some fun interactions
+        document.addEventListener('DOMContentLoaded', () => {
+            // Make stars twinkle on click
+            document.querySelectorAll('.star').forEach(star => {
+                star.style.cursor = 'pointer';
+                star.addEventListener('click', () => {
+                    star.style.animation = 'none';
+                    setTimeout(() => {
+                        star.style.animation = '';
+                    }, 10);
+                });
+            });
+        });
+
+        // Track current audio for play button
+        const originalDisplayWordData = displayWordData;
+        displayWordData = function(data) {
+            window.currentWordAudioUrl = data.audioUrl || null;
+            originalDisplayWordData(data);
+        };
+    </script>
+</body>
+</html>
