@@ -1,0 +1,14 @@
+{
+  "word": "Cat",
+  "vietnamese": "Con mèo",
+  "ipa": "/kæt/",
+  "emoji": "🐱",
+  "examples": [
+    { "en": "The cat is sleeping", "vi": "Con mèo đang ngủ" },
+    { "en": "I have a black cat", "vi": "Tôi có một con mèo đen" }
+  ],
+  "related": ["pet", "animal", "kitten", "meow"],
+  "audioUrl": null,
+  "image": null
+}
+

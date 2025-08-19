@@ -1,0 +1,14 @@
+{
+  "word": "Food",
+  "vietnamese": "Đồ ăn",
+  "ipa": "/fuːd/",
+  "emoji": "🍽️",
+  "examples": [
+    { "en": "I like Vietnamese food", "vi": "Tôi thích đồ ăn Việt Nam" },
+    { "en": "Healthy food is important", "vi": "Đồ ăn lành mạnh rất quan trọng" }
+  ],
+  "related": ["meal", "eat", "restaurant", "healthy"],
+  "audioUrl": null,
+  "image": null
+}
+

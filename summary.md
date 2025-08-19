@@ -208,3 +208,13 @@ updatedAt: 2025-01-01T00:00:00Z
   2) Vào Settings → Pages, chọn Source: GitHub Actions (workflow đã sẵn).
   3) Thêm DNS bản ghi CNAME `e.tway.dev` trỏ về `<username>.github.io.` theo hướng dẫn.
   4) Chờ workflow chạy thành công, truy cập domain.
+
+---
+
+## Dữ liệu mẫu cục bộ (words/)
+- Đã thêm thư mục `words/` chứa một số từ mẫu dạng JSON để chạy ngay trên Pages mà không cần R2:
+  - `words/apple.json`
+  - `words/book.json`
+  - `words/cat.json`
+  - `words/food.json`
+- Mặc định `index.html` đọc `APP_CONFIG.r2BaseUrl = '.'` nên sẽ fetch `./words/<id>.json`. Khi chuyển sang R2, gán `window.APP_CONFIG.r2BaseUrl` trỏ CDN/R2 public endpoint.

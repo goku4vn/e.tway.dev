@@ -1,0 +1,14 @@
+{
+  "word": "Book",
+  "vietnamese": "Quyển sách",
+  "ipa": "/bʊk/",
+  "emoji": "📚",
+  "examples": [
+    { "en": "I love reading books", "vi": "Tôi thích đọc sách" },
+    { "en": "This book is interesting", "vi": "Quyển sách này thú vị" }
+  ],
+  "related": ["read", "library", "story", "learn"],
+  "audioUrl": null,
+  "image": null
+}
+
