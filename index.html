@@ -20,7 +20,8 @@
             align-items: center;
             padding: 20px;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
 
         /* Animated background shapes */
@@ -291,6 +292,41 @@
 
         .hidden { display: none; }
 
+        /* Home section */
+        .home {
+            text-align: center;
+        }
+        .home h1 {
+            font-size: 28px;
+            color: #2d3436;
+            margin-bottom: 12px;
+        }
+        .home p {
+            color: #636e72;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+        .home .links {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .home .link-btn {
+            display: inline-block;
+            padding: 12px 16px;
+            border-radius: 10px;
+            text-decoration: none;
+            color: white;
+            background: linear-gradient(135deg, #4ecdc4, #44a3aa);
+            font-weight: 600;
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+        .home .link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+        }
+
         .loading-spinner {
             width: 60px;
             height: 60px;
@@ -404,6 +440,19 @@
         <div class="star decoration"></div>
 
         <div id="app">
+            <!-- Home state -->
+            <div class="home hidden" id="home">
+                <span class="word-badge">👋 Xin chào</span>
+                <h1>e.tway.dev – Học từ vựng qua QR</h1>
+                <p>
+                    Quét QR dán trên đồ vật để mở trang từ vựng tương ứng.<br>
+                    Mỗi từ có: phiên âm IPA, nghĩa tiếng Việt, ví dụ, từ liên quan và phát âm.
+                </p>
+                <div class="links">
+                    <a class="link-btn" href="https://t.me/etway_group" target="_blank" rel="noopener noreferrer">Tham gia nhóm Telegram</a>
+                    <a class="link-btn" href="/food">Dùng thử: /food</a>
+                </div>
+            </div>
             <!-- Loading state -->
             <div class="loading hidden" id="loading">
                 <div class="loading-spinner"></div>
@@ -487,8 +536,8 @@
         })();
 
         // Config có thể ghi đè từ ngoài bằng window.APP_CONFIG
-        // Mặc định đọc từ thư mục cục bộ `./words`
-        const APP_CONFIG = Object.assign({ r2BaseUrl: '.' }, window.APP_CONFIG || {});
+        // Mặc định sử dụng R2 public bucket đã cung cấp
+        const APP_CONFIG = Object.assign({ r2BaseUrl: 'https://pub-86b487dc9c754d3e8b6516019b4359ad.r2.dev' }, window.APP_CONFIG || {});
 
         // Mock data structure - fallback khi không có API phù hợp
         const mockData = {
@@ -535,7 +584,8 @@
             const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
             if (path) return decodeURIComponent(path);
             const hash = window.location.hash.slice(1);
-            return hash || 'apple';
+            if (hash) return hash;
+            return '';
         }
 
         function isMd5(id) {
@@ -548,10 +598,21 @@
             const error = document.getElementById('error');
             const content = document.getElementById('content');
 
-            // Show loading
-            loading.classList.remove('hidden');
-            error.classList.add('hidden');
-            content.classList.add('hidden');
+            const home = document.getElementById('home');
+            if (!wordId) {
+                // Show home intro
+                home.style.display = '';
+                loading.classList.add('hidden');
+                error.classList.add('hidden');
+                content.classList.add('hidden');
+                return;
+            } else {
+                home.style.display = 'none';
+                // Show loading
+                loading.classList.remove('hidden');
+                error.classList.add('hidden');
+                content.classList.add('hidden');
+            }
 
             try {
                 window.currentRequestedWordId = wordId;
@@ -577,11 +638,19 @@
 
         async function fetchFromR2(id) {
             try {
-                const url = `${APP_CONFIG.r2BaseUrl.replace(/\/$/, '')}/words/${id}.json`;
-                const res = await fetch(url, { cache: 'no-cache' });
-                if (!res.ok) return null;
-                const json = await res.json();
-                return normalizeR2Word(json);
+                const base = APP_CONFIG.r2BaseUrl.replace(/\/$/, '');
+                const urls = [
+                    `${base}/words/${id}.json`,
+                    `${base}/${id}.json`
+                ];
+                for (const url of urls) {
+                    const res = await fetch(url, { cache: 'no-cache' });
+                    if (res.ok) {
+                        const json = await res.json();
+                        return normalizeR2Word(json);
+                    }
+                }
+                return null;
             } catch (_) {
                 return null;
             }
