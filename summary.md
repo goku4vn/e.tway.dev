@@ -60,3 +60,10 @@ Các thay đổi chính trong `index.html`:
 - Bổ sung ảnh minh họa và audio TTS vào JSON (và UI hiển thị ảnh nếu có).
 - Thêm kiểm thử E2E cho các route và trạng thái lỗi.
 
+---
+
+### Cập nhật mới: Nút quét QR trên trang chủ
+- Thêm nút "📷 Quét QR" ở trang chủ, mở overlay camera để quét.
+- Triển khai quét QR bằng `BarcodeDetector` (nếu trình duyệt hỗ trợ), fallback `jsQR` qua CDN.
+- Chỉ chấp nhận các mã thuộc domain `e.tway.dev` hoặc chuỗi MD5 32 ký tự; tự điều hướng đến đường dẫn tương ứng sau khi quét.
+

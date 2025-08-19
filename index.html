@@ -327,6 +327,44 @@
             box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
         }
 
+        /* QR scanner overlay */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 16px;
+        }
+        .scanner {
+            width: 100%;
+            max-width: 520px;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+            text-align: center;
+        }
+        .qr-video {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border-radius: 12px;
+            background: #000;
+            object-fit: cover;
+        }
+        .scanner-help {
+            color: #636e72;
+            margin-top: 10px;
+        }
+        .scanner-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
         .loading-spinner {
             width: 60px;
             height: 60px;
@@ -443,7 +481,7 @@
             <!-- Home state -->
             <div class="home hidden" id="home">
                 <span class="word-badge">👋 Xin chào</span>
-                <h1>e.tway.dev – Học từ vựng qua QR</h1>
+                <h1>Học từ vựng qua QR</h1>
                 <p>
                     Quét mã QR dán lên đồ vật để mở trang từ vựng tương ứng.
                 </p>
@@ -453,6 +491,7 @@
                 <div class="links">
                     <a class="link-btn" href="https://t.me/+qLEmZ-yeMbY4ZGVl" target="_blank" rel="noopener noreferrer">Tham gia nhóm Telegram</a>
                     <a class="link-btn" href="/food">Dùng thử: /food</a>
+                    <button class="create-new-btn" type="button" aria-label="Quét mã QR" onclick="openQrScanner()">📷 Quét QR</button>
                 </div>
             </div>
             <!-- Loading state -->
@@ -521,6 +560,18 @@
                 <button class="create-new-btn" onclick="requestNewWord()">
                     ✨ Yêu cầu thêm từ mới qua Telegram
                 </button>
+            </div>
+        </div>
+
+        <!-- QR Scanner Overlay -->
+        <div id="qrOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Quét mã QR">
+            <div class="scanner">
+                <video id="qrVideo" class="qr-video" autoplay playsinline muted></video>
+                <canvas id="qrCanvas" class="hidden"></canvas>
+                <p class="scanner-help">Đưa mã QR e.tway.dev vào khung để quét</p>
+                <div class="scanner-actions">
+                    <button class="create-new-btn" type="button" aria-label="Dừng quét" onclick="stopQrScan()">Dừng</button>
+                </div>
             </div>
         </div>
     </div>
@@ -800,6 +851,113 @@
             window.currentWordAudioUrl = data.audioUrl || null;
             originalDisplayWordData(data);
         };
+
+        // QR Scan implementation
+        let qrStream = null;
+        let qrScanning = false;
+        let qrDetector = null;
+
+        async function openQrScanner() {
+            const overlay = document.getElementById('qrOverlay');
+            const video = document.getElementById('qrVideo');
+            overlay.classList.remove('hidden');
+            try {
+                qrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+                video.srcObject = qrStream;
+                await video.play();
+                qrScanning = true;
+                if ('BarcodeDetector' in window) {
+                    try { qrDetector = new BarcodeDetector({ formats: ['qr_code'] }); } catch (_) { qrDetector = null; }
+                }
+                scanLoop();
+            } catch (err) {
+                alert('Không thể truy cập camera. Vui lòng cấp quyền camera.');
+                stopQrScan();
+            }
+        }
+
+        async function ensureJsQR() {
+            if (window.jsQR) return true;
+            return new Promise(resolve => {
+                const s = document.createElement('script');
+                s.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
+                s.onload = () => resolve(true);
+                s.onerror = () => resolve(false);
+                document.head.appendChild(s);
+            });
+        }
+
+        async function scanLoop() {
+            const overlay = document.getElementById('qrOverlay');
+            const video = document.getElementById('qrVideo');
+            const canvas = document.getElementById('qrCanvas');
+            const ctx = canvas.getContext('2d');
+
+            while (qrScanning && !overlay.classList.contains('hidden')) {
+                try {
+                    let value = null;
+                    if (qrDetector) {
+                        const codes = await qrDetector.detect(video);
+                        if (codes && codes.length > 0) {
+                            value = codes[0].rawValue || codes[0].rawValueText || null;
+                        }
+                    } else {
+                        const ok = await ensureJsQR();
+                        if (!ok) break;
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const code = window.jsQR(imageData.data, canvas.width, canvas.height);
+                        if (code && code.data) value = code.data;
+                    }
+                    if (value && handleQrResult(value)) {
+                        break;
+                    }
+                } catch (_) {}
+                await new Promise(r => setTimeout(r, 200));
+            }
+        }
+
+        function handleQrResult(text) {
+            // Accept only links to e.tway.dev
+            try {
+                // Normalize
+                let path = '';
+                const m = text.match(/^(?:https?:\/\/)?e\.tway\.dev\/?(.*)$/i);
+                if (m && typeof m[1] === 'string') {
+                    path = '/' + m[1].replace(/^\/+/, '');
+                } else if (/^[a-f0-9]{32}$/i.test(text)) {
+                    // Allow bare md5
+                    path = '/' + text;
+                } else {
+                    alert('Mã QR không thuộc e.tway.dev');
+                    return false;
+                }
+                stopQrScan();
+                history.pushState({}, '', path);
+                const id = getWordFromUrl();
+                loadWordData(id);
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        function stopQrScan() {
+            qrScanning = false;
+            const overlay = document.getElementById('qrOverlay');
+            overlay.classList.add('hidden');
+            const video = document.getElementById('qrVideo');
+            if (qrStream) {
+                qrStream.getTracks().forEach(t => t.stop());
+                qrStream = null;
+            }
+            if (video) {
+                video.pause();
+                video.srcObject = null;
+            }
+        }
     </script>
 </body>
 </html>
