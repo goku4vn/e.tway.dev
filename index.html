@@ -510,7 +510,7 @@
             </div>
 
             <!-- Content -->
-            <div id="content">
+            <div id="content" class="hidden">
                 <div class="header">
                     <span class="word-badge">🌟 Từ vựng hôm nay</span>
                     <h1 class="main-word" id="mainWord">Apple</h1>
@@ -856,6 +856,7 @@
         let qrStream = null;
         let qrScanning = false;
         let qrDetector = null;
+        let qrScanRafId = null;
 
         async function openQrScanner() {
             const overlay = document.getElementById('qrOverlay');
@@ -865,11 +866,14 @@
                 qrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
                 video.srcObject = qrStream;
                 await video.play();
+                if (video.readyState < 2) {
+                    await new Promise(r => video.addEventListener('loadedmetadata', r, { once: true }));
+                }
                 qrScanning = true;
                 if ('BarcodeDetector' in window) {
                     try { qrDetector = new BarcodeDetector({ formats: ['qr_code'] }); } catch (_) { qrDetector = null; }
                 }
-                scanLoop();
+                scanFrame();
             } catch (err) {
                 alert('Không thể truy cập camera. Vui lòng cấp quyền camera.');
                 stopQrScan();
@@ -887,36 +891,39 @@
             });
         }
 
-        async function scanLoop() {
+        async function scanFrame() {
             const overlay = document.getElementById('qrOverlay');
             const video = document.getElementById('qrVideo');
             const canvas = document.getElementById('qrCanvas');
             const ctx = canvas.getContext('2d');
 
-            while (qrScanning && !overlay.classList.contains('hidden')) {
-                try {
-                    let value = null;
-                    if (qrDetector) {
-                        const codes = await qrDetector.detect(video);
-                        if (codes && codes.length > 0) {
-                            value = codes[0].rawValue || codes[0].rawValueText || null;
-                        }
-                    } else {
-                        const ok = await ensureJsQR();
-                        if (!ok) break;
+            if (!qrScanning || overlay.classList.contains('hidden')) return;
+
+            try {
+                let value = null;
+                if (qrDetector) {
+                    const codes = await qrDetector.detect(video);
+                    if (codes && codes.length > 0) {
+                        value = (codes[0].rawValue || codes[0].rawValueText || '').toString();
+                    }
+                } else {
+                    const ok = await ensureJsQR();
+                    if (!ok) return;
+                    if (video.videoWidth && video.videoHeight) {
                         canvas.width = video.videoWidth;
                         canvas.height = video.videoHeight;
                         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                         const code = window.jsQR(imageData.data, canvas.width, canvas.height);
-                        if (code && code.data) value = code.data;
+                        if (code && code.data) value = code.data.toString();
                     }
-                    if (value && handleQrResult(value)) {
-                        break;
-                    }
-                } catch (_) {}
-                await new Promise(r => setTimeout(r, 200));
-            }
+                }
+                if (value && handleQrResult(value)) {
+                    return; // handled and stopped
+                }
+            } catch (_) {}
+
+            qrScanRafId = requestAnimationFrame(scanFrame);
         }
 
         function handleQrResult(text) {
@@ -949,6 +956,10 @@
             const overlay = document.getElementById('qrOverlay');
             overlay.classList.add('hidden');
             const video = document.getElementById('qrVideo');
+            if (qrScanRafId) {
+                cancelAnimationFrame(qrScanRafId);
+                qrScanRafId = null;
+            }
             if (qrStream) {
                 qrStream.getTracks().forEach(t => t.stop());
                 qrStream = null;
