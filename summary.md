@@ -198,5 +198,13 @@ updatedAt: 2025-01-01T00:00:00Z
   - Truy cập `https://e.tway.dev/apple` (demo theo từ) hoặc `https://e.tway.dev/<md5>` (khi đã có JSON công khai trên R2: `words/<md5>.json`).
   - Không cần cài n8n trong repo; workflow tạo từ mới sẽ làm sau.
 
+---
 
-
+## Triển khai GitHub Pages
+- Đã thêm workflow: `.github/workflows/pages.yml` tự động publish khi push nhánh `main`.
+- Đã thêm `CNAME` trỏ domain: `e.tway.dev` và `.nojekyll` để giữ nguyên cấu trúc.
+- Các bước:
+  1) Tạo repo GitHub, push source vào nhánh `main`.
+  2) Vào Settings → Pages, chọn Source: GitHub Actions (workflow đã sẵn).
+  3) Thêm DNS bản ghi CNAME `e.tway.dev` trỏ về `<username>.github.io.` theo hướng dẫn.
+  4) Chờ workflow chạy thành công, truy cập domain.
