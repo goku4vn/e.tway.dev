@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading...</title>
+    <meta http-equiv="refresh" content="0; url=/" />
+    <script>
+      // Fallback SPA redirect to root while preserving path for client routing
+      (function() {
+        var path = location.pathname + location.hash + location.search;
+        sessionStorage.setItem('redirectPath', path);
+        location.replace('/');
+      })();
+    </script>
+</head>
+<body>
+    Đang tải...
+</body>
+</html>
+

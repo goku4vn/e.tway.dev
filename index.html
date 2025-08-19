@@ -472,6 +472,17 @@
     </div>
 
     <script>
+        // Handle redirect from 404.html on GitHub Pages
+        (function() {
+            try {
+                const saved = sessionStorage.getItem('redirectPath');
+                if (saved) {
+                    sessionStorage.removeItem('redirectPath');
+                    history.replaceState({}, '', saved);
+                }
+            } catch (_) {}
+        })();
+
         // Config có thể ghi đè từ ngoài bằng window.APP_CONFIG
         const APP_CONFIG = Object.assign({ r2BaseUrl: '' }, window.APP_CONFIG || {});
 
