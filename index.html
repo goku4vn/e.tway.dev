@@ -445,11 +445,13 @@
                 <span class="word-badge">👋 Xin chào</span>
                 <h1>e.tway.dev – Học từ vựng qua QR</h1>
                 <p>
-                    Quét QR dán trên đồ vật để mở trang từ vựng tương ứng.<br>
-                    Mỗi từ có: phiên âm IPA, nghĩa tiếng Việt, ví dụ, từ liên quan và phát âm.
+                    Quét mã QR dán lên đồ vật để mở trang từ vựng tương ứng.
+                </p>
+                <p>
+                    Ứng dụng hiển thị: từ tiếng Anh, phiên âm IPA, nghĩa tiếng Việt, ví dụ, từ liên quan và nút phát âm.
                 </p>
                 <div class="links">
-                    <a class="link-btn" href="https://t.me/etway_group" target="_blank" rel="noopener noreferrer">Tham gia nhóm Telegram</a>
+                    <a class="link-btn" href="https://t.me/+qLEmZ-yeMbY4ZGVl" target="_blank" rel="noopener noreferrer">Tham gia nhóm Telegram</a>
                     <a class="link-btn" href="/food">Dùng thử: /food</a>
                 </div>
             </div>
@@ -601,13 +603,13 @@
             const home = document.getElementById('home');
             if (!wordId) {
                 // Show home intro
-                home.style.display = '';
+                home.classList.remove('hidden');
                 loading.classList.add('hidden');
                 error.classList.add('hidden');
                 content.classList.add('hidden');
                 return;
             } else {
-                home.style.display = 'none';
+                home.classList.add('hidden');
                 // Show loading
                 loading.classList.remove('hidden');
                 error.classList.add('hidden');
