@@ -28,6 +28,7 @@ function isMd5(id) {
 
 // Load word data (chỉ dùng R2 nếu id là md5; nếu không có dữ liệu → hiện lỗi)
 async function loadWordData(wordId) {
+    console.log("Loading word data");
     const loading = document.getElementById('loading');
     const error = document.getElementById('error');
     const content = document.getElementById('content');
@@ -56,10 +57,13 @@ async function loadWordData(wordId) {
         data = await fetchFromR2(wordId);
 
         if (data) {
+            console.log(data);
             displayWordData(data);
             loading.classList.add('hidden');
             content.classList.remove('hidden');
             error.classList.add('hidden');
+            console.log("Loaded successfully");
+            console.log(content.classList);
         } else {
             throw new Error('NOT_FOUND');
         }
@@ -99,7 +103,10 @@ async function fetchFromR2(id) {
             console.log(res);
             if (res.ok) {
                 const json = await res.json();
-                return normalizeR2Word(json);
+                console.log(json);
+                var data = normalizeR2Word(json);
+                console.log(data);
+                return data;
             }
         }
         return null;
