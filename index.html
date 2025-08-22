@@ -109,19 +109,6 @@
             50% { transform: scale(1.05); }
         }
 
-        .main-word {
-            font-size: 48px;
-            font-weight: bold;
-            color: #2d3436;
-            margin-bottom: 10px;
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
         .top-row {
             display: flex;
             align-items: center;
@@ -526,10 +513,6 @@
                 padding: 30px 20px;
             }
 
-            .main-word {
-                font-size: 36px;
-            }
-
             .top-row {
                 gap: 12px;
             }
@@ -652,7 +635,6 @@
                 <div class="header">
                     <span class="word-badge">🌟 Từ vựng hôm nay</span>
                     <div class="text-info">
-                        <h1 class="main-word" id="mainWord">Apple</h1>
                         <div class="top-row">
                             <div class="qr-wrap" id="qrCode" onclick="showCurrentQR()" title="Xem QR code cho đường dẫn hiện tại">
                                 <img id="qrImage" alt="QR Code">
@@ -888,8 +870,8 @@
 
         // Display word data
         function displayWordData(data) {
-            document.getElementById('mainWord').textContent = data.word;
             document.getElementById('englishWord').textContent = data.word;
+            document.getElementById('explanationVi').textContent = data.vietnamese;
             document.getElementById('ipa').textContent = data.ipa;
 
             // Update QR image source
@@ -953,7 +935,7 @@
 
         // Play sound function
         async function playSound(event) {
-            const word = document.getElementById('mainWord').textContent;
+            const word = document.getElementById('englishWord').textContent;
             const audioUrl = window.currentWordAudioUrl;
             
             try {
