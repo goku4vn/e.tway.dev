@@ -122,52 +122,68 @@
             to { opacity: 1; }
         }
 
-        .pronunciation {
+        .top-row {
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 15px;
+            justify-content: center;
             margin-bottom: 20px;
         }
 
-        .ipa {
-            font-size: 20px;
-            color: #636e72;
-            font-style: italic;
-        }
-
-        .qr-code {
+        .qr-wrap {
             width: 60px;
             height: 60px;
-            background: #ffffff;
+            display: grid;
+            place-items: center;
             border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid #e9ecef;
             overflow: hidden;
             flex-shrink: 0;
+            border: 2px solid #e9ecef;
+            background: #ffffff;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .qr-code:hover {
+        .qr-wrap:hover {
             transform: scale(1.05);
             border-color: #667eea;
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
 
-        .qr-code img {
+        .qr-wrap img {
+            display: block;
             width: 100%;
             height: 100%;
-            display: block;
         }
 
         .text-info {
             display: flex;
             flex-direction: column;
             justify-content: center;
-            text-align: center;
+            text-align: left;
+        }
+
+        .english {
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1.1;
+            color: #2d3436;
+            margin-bottom: 5px;
+        }
+
+        .ipa {
+            font-size: 20px;
+            color: #636e72;
+            font-style: italic;
+            font-family: "Noto Sans", "Inter", Arial, sans-serif;
+        }
+
+        .pronunciation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
         }
 
         .play-button {
@@ -514,9 +530,21 @@
                 font-size: 36px;
             }
 
-            .qr-code {
+            .top-row {
+                gap: 12px;
+            }
+
+            .qr-wrap {
                 width: 48px;
                 height: 48px;
+            }
+
+            .english {
+                font-size: 28px;
+            }
+
+            .ipa {
+                font-size: 18px;
             }
 
             .play-button {
@@ -625,11 +653,16 @@
                     <span class="word-badge">🌟 Từ vựng hôm nay</span>
                     <div class="text-info">
                         <h1 class="main-word" id="mainWord">Apple</h1>
-                        <div class="pronunciation">
-                            <span class="ipa" id="ipa">/ˈæp.əl/</span>
-                            <div class="qr-code" id="qrCode" onclick="showCurrentQR()" title="Xem QR code cho đường dẫn hiện tại">
+                        <div class="top-row">
+                            <div class="qr-wrap" id="qrCode" onclick="showCurrentQR()" title="Xem QR code cho đường dẫn hiện tại">
                                 <img id="qrImage" alt="QR Code">
                             </div>
+                            <div class="text-info">
+                                <div class="english" id="englishWord">Apple</div>
+                                <div class="ipa" id="ipa">/ˈæp.əl/</div>
+                            </div>
+                        </div>
+                        <div class="pronunciation">
                             <button class="play-button" type="button" aria-label="Phát âm từ" title="Phát âm từ" onclick="playSound(event)">
                                 <div class="play-icon"></div>
                             </button>
@@ -856,7 +889,7 @@
         // Display word data
         function displayWordData(data) {
             document.getElementById('mainWord').textContent = data.word;
-            document.getElementById('explanationVi').textContent = data.vietnamese;
+            document.getElementById('englishWord').textContent = data.word;
             document.getElementById('ipa').textContent = data.ipa;
 
             // Update QR image source
