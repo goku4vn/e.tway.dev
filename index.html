@@ -188,32 +188,6 @@
             font-weight: 600;
         }
 
-        .image-container {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            text-align: center;
-        }
-
-        .word-image {
-            width: 200px;
-            height: 200px;
-            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
-            border-radius: 20px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 100px;
-            animation: bounce 2s ease-in-out infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
         .examples {
             background: #fff3e0;
             padding: 20px;
@@ -246,6 +220,45 @@
 
         .example-item strong {
             color: #2d3436;
+        }
+
+        .example-audio {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .example-play-btn {
+            background: linear-gradient(135deg, #ff9800, #ffb74d);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(255, 152, 0, 0.3);
+        }
+
+        .example-play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+        }
+
+        .example-play-btn:active {
+            transform: scale(0.95);
+        }
+
+        .example-play-icon {
+            width: 0;
+            height: 0;
+            border-left: 10px solid white;
+            border-top: 7px solid transparent;
+            border-bottom: 7px solid transparent;
+            margin-left: 2px;
         }
 
         .related-words {
@@ -335,8 +348,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 999;
+            z-index: -1;
             padding: 16px;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity .2s ease;
+        }
+        .overlay.show {
+            z-index: 999;
+            pointer-events: auto;
+            opacity: 1;
+            visibility: visible;
         }
         .scanner {
             width: 100%;
@@ -425,10 +448,15 @@
                 font-size: 20px;
             }
 
-            .word-image {
-                width: 150px;
-                height: 150px;
-                font-size: 80px;
+            .example-play-btn {
+                width: 28px;
+                height: 28px;
+            }
+
+            .example-play-icon {
+                border-left: 8px solid white;
+                border-top: 6px solid transparent;
+                border-bottom: 6px solid transparent;
             }
         }
 
@@ -527,12 +555,6 @@
                     <p id="vietnamese">Quả táo</p>
                 </div>
 
-                <div class="image-container">
-                    <div class="word-image" id="wordImage">
-                        🍎
-                    </div>
-                </div>
-
                 <div class="examples">
                     <h3>📝 Ví dụ</h3>
                     <div id="examples">
@@ -563,17 +585,7 @@
             </div>
         </div>
 
-        <!-- QR Scanner Overlay -->
-        <div id="qrOverlay" class="overlay hidden" role="dialog" aria-modal="true" aria-label="Quét mã QR">
-            <div class="scanner">
-                <video id="qrVideo" class="qr-video" autoplay playsinline muted></video>
-                <canvas id="qrCanvas" class="hidden"></canvas>
-                <p class="scanner-help">Đưa mã QR e.tway.dev vào khung để quét</p>
-                <div class="scanner-actions">
-                    <button class="create-new-btn" type="button" aria-label="Dừng quét" onclick="stopQrScan()">Dừng</button>
-                </div>
-            </div>
-        </div>
+        <!-- QR Scanner Overlay sẽ được tạo bằng JS khi cần -->
     </div>
 
     <script>
@@ -752,14 +764,19 @@
             document.getElementById('mainWord').textContent = data.word;
             document.getElementById('vietnamese').textContent = data.vietnamese;
             document.getElementById('ipa').textContent = data.ipa;
-            document.getElementById('wordImage').textContent = data.emoji;
 
-            // Display examples
+            // Display examples with audio buttons
             const examplesContainer = document.getElementById('examples');
-            examplesContainer.innerHTML = data.examples.map(ex => `
+            examplesContainer.innerHTML = data.examples.map((ex, index) => `
                 <div class="example-item">
                     <strong>${ex.en}</strong><br>
                     ${ex.vi}
+                    <div class="example-audio">
+                        <button class="example-play-btn" type="button" aria-label="Phát âm câu ví dụ ${index + 1}" title="Phát âm câu ví dụ ${index + 1}" onclick="playExampleAudio('${ex.en}', ${index})">
+                            <div class="example-play-icon"></div>
+                        </button>
+                        <span style="font-size: 12px; color: #ff9800;">Phát âm câu</span>
+                    </div>
                 </div>
             `).join('');
 
@@ -788,6 +805,26 @@
             } catch (_) {}
 
             // Visual feedback
+            const button = event.currentTarget;
+            button.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                button.style.transform = '';
+            }, 200);
+        }
+
+        // Play example audio function
+        async function playExampleAudio(text, index) {
+            try {
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'en-US';
+                    utterance.rate = 0.8;
+                    utterance.pitch = 1.0;
+                    speechSynthesis.speak(utterance);
+                }
+            } catch (_) {}
+
+            // Visual feedback for example play button
             const button = event.currentTarget;
             button.style.transform = 'scale(0.95)';
             setTimeout(() => {
@@ -859,9 +896,27 @@
         let qrScanRafId = null;
 
         async function openQrScanner() {
-            const overlay = document.getElementById('qrOverlay');
+            let overlay = document.getElementById('qrOverlay');
+            if (!overlay) {
+                overlay = document.createElement('div');
+                overlay.id = 'qrOverlay';
+                overlay.className = 'overlay';
+                overlay.setAttribute('role', 'dialog');
+                overlay.setAttribute('aria-modal', 'true');
+                overlay.setAttribute('aria-label', 'Quét mã QR');
+                overlay.innerHTML = `
+                  <div class="scanner">
+                    <video id="qrVideo" class="qr-video" autoplay playsinline muted></video>
+                    <canvas id="qrCanvas" class="hidden"></canvas>
+                    <p class="scanner-help">Đưa mã QR e.tway.dev vào khung để quét</p>
+                    <div class="scanner-actions">
+                      <button class="create-new-btn" type="button" aria-label="Dừng quét" onclick="stopQrScan()">Dừng</button>
+                    </div>
+                  </div>`;
+                document.body.appendChild(overlay);
+            }
             const video = document.getElementById('qrVideo');
-            overlay.classList.remove('hidden');
+            overlay.classList.add('show');
             try {
                 qrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
                 video.srcObject = qrStream;
@@ -954,7 +1009,7 @@
         function stopQrScan() {
             qrScanning = false;
             const overlay = document.getElementById('qrOverlay');
-            overlay.classList.add('hidden');
+            if (overlay) overlay.classList.remove('show');
             const video = document.getElementById('qrVideo');
             if (qrScanRafId) {
                 cancelAnimationFrame(qrScanRafId);
