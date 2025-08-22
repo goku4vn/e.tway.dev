@@ -136,6 +136,30 @@
             font-style: italic;
         }
 
+        .qr-code {
+            width: 40px;
+            height: 40px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid #e9ecef;
+        }
+
+        .qr-code:hover {
+            transform: scale(1.1);
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .qr-code svg {
+            width: 24px;
+            height: 24px;
+        }
+
         .play-button {
             background: linear-gradient(135deg, #ff6b6b, #ff8787);
             border: none;
@@ -166,6 +190,42 @@
             border-top: 12px solid transparent;
             border-bottom: 12px solid transparent;
             margin-left: 3px;
+        }
+
+        .explanations {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 4px solid #4ecdc4;
+        }
+
+        .explanations h3 {
+            color: #4ecdc4;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .explanation-item {
+            margin-bottom: 16px;
+        }
+
+        .explanation-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .explanation-item h4 {
+            color: #2d3436;
+            font-size: 14px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .explanation-item p {
+            color: #636e72;
+            font-size: 16px;
+            line-height: 1.5;
+            margin: 0;
         }
 
         .vietnamese {
@@ -444,8 +504,25 @@
                 font-size: 36px;
             }
 
-            .vietnamese p {
-                font-size: 20px;
+            .qr-code {
+                width: 32px;
+                height: 32px;
+            }
+
+            .qr-code svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            .play-button {
+                width: 44px;
+                height: 44px;
+            }
+
+            .play-icon {
+                border-left: 16px solid white;
+                border-top: 11px solid transparent;
+                border-bottom: 11px solid transparent;
             }
 
             .example-play-btn {
@@ -544,15 +621,28 @@
                     <h1 class="main-word" id="mainWord">Apple</h1>
                     <div class="pronunciation">
                         <span class="ipa" id="ipa">/ˈæp.əl/</span>
+                        <div class="qr-code" id="qrCode" onclick="showCurrentQR()" title="Xem QR code cho đường dẫn hiện tại">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M3 3h6v6H3V3zM15 3h6v6h-6V3zM3 15h6v6H3v-6zM15 15h6v6h-6v-6z" fill="#667eea"/>
+                                <path d="M6 6h2v2H6V6zM16 6h2v2h-2V6zM6 16h2v2H6v-2zM16 16h2v2h-2v-2z" fill="white"/>
+                            </svg>
+                        </div>
                         <button class="play-button" type="button" aria-label="Phát âm từ" title="Phát âm từ" onclick="playSound(event)">
                             <div class="play-icon"></div>
                         </button>
                     </div>
                 </div>
 
-                <div class="vietnamese">
-                    <h3>Tiếng Việt</h3>
-                    <p id="vietnamese">Quả táo</p>
+                <div class="explanations">
+                    <h3>Giải thích</h3>
+                    <div class="explanation-item">
+                        <h4>Tiếng Việt</h4>
+                        <p id="explanationVi">Quả táo là một loại trái cây phổ biến, có vị ngọt và giòn.</p>
+                    </div>
+                    <div class="explanation-item">
+                        <h4>English</h4>
+                        <p id="explanationEn">Apple is a common fruit with a sweet taste and crisp texture.</p>
+                    </div>
                 </div>
 
                 <div class="examples">
@@ -762,7 +852,7 @@
         // Display word data
         function displayWordData(data) {
             document.getElementById('mainWord').textContent = data.word;
-            document.getElementById('vietnamese').textContent = data.vietnamese;
+            document.getElementById('explanationVi').textContent = data.vietnamese;
             document.getElementById('ipa').textContent = data.ipa;
 
             // Display examples with audio buttons
@@ -785,6 +875,12 @@
             relatedContainer.innerHTML = data.related.map(word => `
                 <span class="tag" onclick="navigateToWord('${word}')">${word}</span>
             `).join('');
+        }
+
+        // Show current QR code
+        function showCurrentQR() {
+            const currentUrl = window.location.origin + window.location.pathname;
+            alert(`🔗 Đường dẫn hiện tại:\n${currentUrl}\n\n📱 Quét QR này để chia sẻ từ vựng!`);
         }
 
         // Play sound function
