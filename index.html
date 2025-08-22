@@ -507,6 +507,48 @@
             box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
         }
 
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-btn.primary {
+            background: linear-gradient(135deg, #4ecdc4, #44a3aa);
+            color: white;
+        }
+
+        .control-btn.secondary {
+            background: #f8f9fa;
+            color: #2d3436;
+            border: 2px solid #e9ecef;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .control-btn.primary:hover {
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.4);
+        }
+
         /* Mobile responsive */
         @media (max-width: 480px) {
             .container {
@@ -539,6 +581,16 @@
                 border-left: 16px solid white;
                 border-top: 11px solid transparent;
                 border-bottom: 11px solid transparent;
+            }
+
+            .controls {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .control-btn {
+                width: 100%;
+                justify-content: center;
             }
 
             .example-play-btn {
@@ -691,6 +743,18 @@
                 <button class="create-new-btn" onclick="requestNewWord()">
                     ✨ Yêu cầu thêm từ mới qua Telegram
                 </button>
+
+                <div class="controls">
+                    <button class="control-btn primary" onclick="printVocabulary()">
+                        🖨️ In từ vựng
+                    </button>
+                    <button class="control-btn secondary" onclick="exportToPDF()">
+                        📄 Xuất PDF
+                    </button>
+                    <button class="control-btn secondary" onclick="exportToImage()">
+                        🖼️ Xuất ảnh
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -931,6 +995,97 @@
             
             popup.onclick = () => document.body.removeChild(popup);
             document.body.appendChild(popup);
+        }
+
+        // Print vocabulary function
+        function printVocabulary() {
+            const printWindow = window.open('', '_blank');
+            const currentData = getCurrentVocabularyData();
+            
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Vocabulary - ${currentData.word}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; }
+                        .vocab-card { 
+                            border: 2px solid #333; 
+                            border-radius: 10px; 
+                            padding: 20px; 
+                            max-width: 400px; 
+                            margin: 0 auto;
+                        }
+                        .header { text-align: center; margin-bottom: 20px; }
+                        .word { font-size: 32px; font-weight: bold; margin-bottom: 10px; }
+                        .ipa { font-size: 20px; color: #666; font-style: italic; }
+                        .section { margin: 15px 0; }
+                        .section h3 { color: #333; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+                        .example { margin: 8px 0; padding: 8px; background: #f9f9f9; border-radius: 5px; }
+                        .related { display: flex; flex-wrap: wrap; gap: 8px; }
+                        .tag { background: #e9ecef; padding: 4px 8px; border-radius: 15px; font-size: 12px; }
+                        @media print { body { margin: 0; } .vocab-card { border: none; } }
+                    </style>
+                </head>
+                <body>
+                    <div class="vocab-card">
+                        <div class="header">
+                            <div class="word">${currentData.word}</div>
+                            <div class="ipa">${currentData.ipa}</div>
+                        </div>
+                        <div class="section">
+                            <h3>Giải thích</h3>
+                            <p><strong>Tiếng Việt:</strong> ${currentData.vietnamese}</p>
+                            <p><strong>English:</strong> ${currentData.english}</p>
+                        </div>
+                        <div class="section">
+                            <h3>Ví dụ</h3>
+                            ${currentData.examples.map(ex => `
+                                <div class="example">
+                                    <strong>${ex.en}</strong><br>
+                                    ${ex.vi}
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="section">
+                            <h3>Từ liên quan</h3>
+                            <div class="related">
+                                ${currentData.related.map(word => `<span class="tag">${word}</span>`).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            printWindow.focus();
+            setTimeout(() => printWindow.print(), 500);
+        }
+
+        // Export to PDF function
+        function exportToPDF() {
+            alert('📄 Tính năng xuất PDF sẽ được triển khai sau!\n\nHiện tại bạn có thể dùng nút "In từ vựng" để in trang.');
+        }
+
+        // Export to Image function
+        function exportToImage() {
+            alert('🖼️ Tính năng xuất ảnh sẽ được triển khai sau!\n\nHiện tại bạn có thể dùng nút "In từ vựng" để in trang.');
+        }
+
+        // Get current vocabulary data
+        function getCurrentVocabularyData() {
+            return {
+                word: document.getElementById('englishWord').textContent,
+                ipa: document.getElementById('ipa').textContent,
+                vietnamese: document.getElementById('explanationVi').textContent,
+                english: document.getElementById('explanationEn').textContent,
+                examples: Array.from(document.querySelectorAll('.example-item')).map(item => ({
+                    en: item.querySelector('strong').textContent,
+                    vi: item.textContent.replace(item.querySelector('strong').textContent, '').trim()
+                })),
+                related: Array.from(document.querySelectorAll('.tag')).map(tag => tag.textContent)
+            };
         }
 
         // Play sound function
