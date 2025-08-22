@@ -73,6 +73,22 @@ async function loadWordData(wordId) {
 async function fetchFromR2(id) {
     try {
         const base = APP_CONFIG.r2BaseUrl.replace(/\/$/, '');
+        
+        // Nếu base là '.' thì fetch từ local words directory
+        if (base === '.') {
+            const localUrl = `./words/${id}.json`;
+            try {
+                const res = await fetch(localUrl, { cache: 'no-cache' });
+                if (res.ok) {
+                    const json = await res.json();
+                    return normalizeR2Word(json);
+                }
+            } catch (_) {
+                // Fallback to R2 if local fails
+            }
+        }
+        
+        // Fetch từ R2 bucket
         const urls = [
             `${base}/words/${id}.json`,
             `${base}/${id}.json`
@@ -126,7 +142,7 @@ function displayWordData(data) {
             </div>
         `).join('');
     } else {
-        // Fallback to old structure
+        // Fallback to old structure or vietnamese field
         explanationsContainer.innerHTML = `
             <div class="explanation-item">
                 <h4>Tiếng Việt</h4>
@@ -134,7 +150,7 @@ function displayWordData(data) {
             </div>
             <div class="explanation-item">
                 <h4>English</h4>
-                <p>${data.explanationEn || ''}</p>
+                <p>${data.explanationEn || data.word || ''}</p>
             </div>
         `;
     }
@@ -344,6 +360,16 @@ function requestNewWord() {
     alert('🚀 Tính năng này sẽ mở Telegram bot để yêu cầu từ mới!\n\nTelegram: @YourVocabBot\nGõ: /new [từ cần tạo]');
 }
 
+// Request new word with default word from URL
+function requestNewWordWithDefault() {
+    const wordId = getWordFromUrl();
+    if (wordId) {
+        alert(`🚀 Yêu cầu tạo từ mới: "${wordId}"\n\nTelegram: @YourVocabBot\nGõ: /new ${wordId}`);
+    } else {
+        requestNewWord();
+    }
+}
+
 // QR Scan implementation
 let qrStream = null;
 let qrScanning = false;
@@ -486,6 +512,19 @@ displayWordData = function(data) {
     window.currentWordAudioUrl = data.audioUrl || null;
     originalDisplayWordData(data);
 };
+
+// Export functions to global scope for HTML onclick
+window.playSound = playSound;
+window.playExampleAudio = playExampleAudio;
+window.navigateToWord = navigateToWord;
+window.showCurrentQR = showCurrentQR;
+window.printVocabulary = printVocabulary;
+window.exportToPDF = exportToPDF;
+window.exportToImage = exportToImage;
+window.requestNewWord = requestNewWord;
+window.requestNewWordWithDefault = requestNewWordWithDefault;
+window.openQrScanner = openQrScanner;
+window.stopQrScan = stopQrScan;
 
 // Initialize on load
 window.addEventListener('load', () => {
