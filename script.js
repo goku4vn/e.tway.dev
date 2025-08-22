@@ -73,28 +73,30 @@ async function loadWordData(wordId) {
 async function fetchFromR2(id) {
     try {
         const base = APP_CONFIG.r2BaseUrl.replace(/\/$/, '');
-        
+        console.log(base);
         // Nếu base là '.' thì fetch từ local words directory
-        if (base === '.') {
-            const localUrl = `./words/${id}.json`;
-            try {
-                const res = await fetch(localUrl, { cache: 'no-cache' });
-                if (res.ok) {
-                    const json = await res.json();
-                    return normalizeR2Word(json);
-                }
-            } catch (_) {
-                // Fallback to R2 if local fails
-            }
-        }
+        // if (base === '.') {
+        //     const localUrl = `./words/${id}.json`;
+        //     try {
+        //         const res = await fetch(localUrl, { cache: 'no-cache' });
+        //         if (res.ok) {
+        //             const json = await res.json();
+        //             return normalizeR2Word(json);
+        //         }
+        //     } catch (_) {
+        //         // Fallback to R2 if local fails
+        //     }
+        // }
         
         // Fetch từ R2 bucket
         const urls = [
-            `${base}/words/${id}.json`,
-            `${base}/${id}.json`
+            `${base}/words/${id}.json`
+            // `${base}/${id}.json`
         ];
         for (const url of urls) {
+            console.log(url);
             const res = await fetch(url, { cache: 'no-cache' });
+            console.log(res);
             if (res.ok) {
                 const json = await res.json();
                 return normalizeR2Word(json);
