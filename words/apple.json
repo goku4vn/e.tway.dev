@@ -2,12 +2,14 @@
   "word": "Apple",
   "vietnamese": "Quả táo",
   "ipa": "/ˈæp.əl/",
-  "emoji": "🍎",
+  "explanations": [
+    { "vi": "Quả táo là một loại trái cây phổ biến, có vị ngọt và giòn, thường có màu đỏ, xanh hoặc vàng.", "en": "Apple is a common fruit with a sweet taste and crisp texture, usually red, green, or yellow in color." }
+  ],
   "examples": [
     { "en": "I eat an apple every day", "vi": "Tôi ăn một quả táo mỗi ngày" },
     { "en": "The apple is red and sweet", "vi": "Quả táo màu đỏ và ngọt" }
   ],
-  "related": ["fruit", "food", "healthy", "tree"],
+  "related": ["fruit", "food", "healthy", "tree", "orchard", "juice"],
   "audioUrl": null,
   "image": null
 }

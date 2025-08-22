@@ -2,12 +2,14 @@
   "word": "Cat",
   "vietnamese": "Con mèo",
   "ipa": "/kæt/",
-  "emoji": "🐱",
+  "explanations": [
+    { "vi": "Con mèo là một loài động vật có vú, thuộc họ mèo, thường được nuôi làm thú cưng, có tính cách độc lập và thích săn chuột.", "en": "A cat is a mammal belonging to the feline family, commonly kept as a pet, known for its independent nature and hunting mice." }
+  ],
   "examples": [
     { "en": "The cat is sleeping", "vi": "Con mèo đang ngủ" },
     { "en": "I have a black cat", "vi": "Tôi có một con mèo đen" }
   ],
-  "related": ["pet", "animal", "kitten", "meow"],
+  "related": ["pet", "animal", "kitten", "meow", "feline", "whiskers", "paw"],
   "audioUrl": null,
   "image": null
 }

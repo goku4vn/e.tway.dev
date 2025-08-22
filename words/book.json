@@ -2,12 +2,14 @@
   "word": "Book",
   "vietnamese": "Quyển sách",
   "ipa": "/bʊk/",
-  "emoji": "📚",
+  "explanations": [
+    { "vi": "Quyển sách là một tập hợp các trang giấy có chứa thông tin, câu chuyện hoặc kiến thức để đọc và học hỏi.", "en": "A book is a collection of printed pages containing information, stories, or knowledge for reading and learning." }
+  ],
   "examples": [
     { "en": "I love reading books", "vi": "Tôi thích đọc sách" },
     { "en": "This book is interesting", "vi": "Quyển sách này thú vị" }
   ],
-  "related": ["read", "library", "story", "learn"],
+  "related": ["read", "library", "story", "learn", "author", "page", "chapter"],
   "audioUrl": null,
   "image": null
 }
