@@ -2,11 +2,16 @@
 (function() {
     try {
         const saved = sessionStorage.getItem('redirectPath');
+        console.log('Redirect check - saved path:', saved);
         if (saved) {
             sessionStorage.removeItem('redirectPath');
             history.replaceState({}, '', saved);
+            console.log('Redirect applied - new URL:', window.location.href);
+            console.log('Redirect applied - pathname:', window.location.pathname);
         }
-    } catch (_) {}
+    } catch (error) {
+        console.log('Redirect error:', error);
+    }
 })();
 
 // Config có thể ghi đè từ ngoài bằng window.APP_CONFIG
@@ -16,9 +21,24 @@ const APP_CONFIG = Object.assign({ r2BaseUrl: 'https://pub-86b487dc9c754d3e8b651
 // Helpers
 function getWordFromUrl() {
     const path = window.location.pathname.replace(/^\/+|\/+$/g, '');
-    if (path) return decodeURIComponent(path);
+    console.log('getWordFromUrl - pathname:', window.location.pathname, 'extracted path:', path);
+    if (path) {
+        const decoded = decodeURIComponent(path);
+        console.log('getWordFromUrl - decoded path:', decoded);
+        // Normalize to lowercase for consistency with filenames
+        const normalized = decoded.toLowerCase().trim();
+        console.log('getWordFromUrl - normalized path:', normalized);
+        return normalized;
+    }
     const hash = window.location.hash.slice(1);
-    if (hash) return hash;
+    if (hash) {
+        console.log('getWordFromUrl - hash:', hash);
+        // Normalize hash to lowercase as well
+        const normalizedHash = hash.toLowerCase().trim();
+        console.log('getWordFromUrl - normalized hash:', normalizedHash);
+        return normalizedHash;
+    }
+    console.log('getWordFromUrl - no path or hash found');
     return '';
 }
 
@@ -28,95 +48,135 @@ function isMd5(id) {
 
 // Load word data (chỉ dùng R2 nếu id là md5; nếu không có dữ liệu → hiện lỗi)
 async function loadWordData(wordId) {
-    console.log("Loading word data");
-    const loading = document.getElementById('loading');
-    const error = document.getElementById('error');
-    const content = document.getElementById('content');
-    const home = document.getElementById('home');
+    console.log("Loading word data for wordId:", wordId);
     
-    if (!wordId) {
+    if (!wordId || typeof wordId !== 'string' || wordId.trim() === '') {
+        console.log('No valid wordId provided, showing home');
+        const loading = document.getElementById('loading');
+        const error = document.getElementById('error');
+        const content = document.getElementById('content');
+        const home = document.getElementById('home');
+        
         // Show home intro
         home.classList.remove('hidden');
         loading.classList.add('hidden');
         error.classList.add('hidden');
         content.classList.add('hidden');
         return;
-    } else {
-        home.classList.add('hidden');
-        // Show loading
-        loading.classList.remove('hidden');
-        error.classList.add('hidden');
-        content.classList.add('hidden');
     }
+    
+    const loading = document.getElementById('loading');
+    const error = document.getElementById('error');
+    const content = document.getElementById('content');
+    const home = document.getElementById('home');
+    
+    if (!loading || !error || !content || !home) {
+        console.error('Required DOM elements not found:', { loading, error, content, home });
+        return;
+    }
+    
+    home.classList.add('hidden');
+    // Show loading
+    loading.classList.remove('hidden');
+    error.classList.add('hidden');
+    content.classList.add('hidden');
 
     try {
         window.currentRequestedWordId = wordId;
         let data = null;
 
         // Ưu tiên fetch từ nguồn JSON (R2 hoặc local ./words)
+        console.log('Calling fetchFromR2 with wordId:', wordId);
         data = await fetchFromR2(wordId);
+        console.log('fetchFromR2 returned:', data);
 
         if (data) {
-            console.log(data);
+            console.log('Word data loaded successfully:', data);
             displayWordData(data);
             loading.classList.add('hidden');
             content.classList.remove('hidden');
             error.classList.add('hidden');
-            console.log("Loaded successfully");
-            console.log(content.classList);
+            console.log("Displayed successfully");
         } else {
+            console.log('No data returned from fetchFromR2');
             throw new Error('NOT_FOUND');
         }
     } catch (e) {
-        loading.classList.add('hidden');
-        content.classList.add('hidden');
-        error.classList.remove('hidden');
+        console.log('Error in loadWordData:', e);
+        if (loading && error && content) {
+            loading.classList.add('hidden');
+            content.classList.add('hidden');
+            error.classList.remove('hidden');
+        } else {
+            console.error('Cannot update UI elements due to missing DOM elements');
+        }
     }
 }
 
 async function fetchFromR2(id) {
+    console.log('fetchFromR2 called with id:', id);
+    
+    if (!id || typeof id !== 'string') {
+        console.error('Invalid id provided to fetchFromR2:', id);
+        return null;
+    }
+    
+    // Normalize the id to lowercase for consistency
+    const normalizedId = id.toLowerCase().trim();
+    console.log('Normalized id:', normalizedId);
+    
     try {
         const base = APP_CONFIG.r2BaseUrl.replace(/\/$/, '');
-        console.log(base);
-        // Nếu base là '.' thì fetch từ local words directory
-        // if (base === '.') {
-        //     const localUrl = `./words/${id}.json`;
-        //     try {
-        //         const res = await fetch(localUrl, { cache: 'no-cache' });
-        //         if (res.ok) {
-        //             const json = await res.json();
-        //             return normalizeR2Word(json);
-        //         }
-        //     } catch (_) {
-        //         // Fallback to R2 if local fails
-        //     }
-        // }
+        console.log('R2 base URL:', base);
         
-        // Fetch từ R2 bucket
-        const urls = [
-            `${base}/words/${id}.json`
-            // `${base}/${id}.json`
-        ];
-        for (const url of urls) {
-            console.log(url);
-            const res = await fetch(url, { cache: 'no-cache' });
-            console.log(res);
+        // First try to fetch from local words directory
+        const localUrl = `./words/${normalizedId}.json`;
+        console.log('Trying local URL:', localUrl);
+        try {
+            const res = await fetch(localUrl, { cache: 'no-cache' });
+            console.log('Local fetch response:', res.status, res.statusText);
             if (res.ok) {
                 const json = await res.json();
-                console.log(json);
+                console.log('Loaded from local:', json);
+                return normalizeR2Word(json);
+            } else {
+                console.log('Local fetch failed with status:', res.status);
+            }
+        } catch (localError) {
+            console.log('Local fetch error:', localError);
+            // Continue to R2 fetch
+        }
+        
+        // If local fetch fails, try R2 bucket
+        const urls = [
+            `${base}/words/${normalizedId}.json`
+            // `${base}/${normalizedId}.json`
+        ];
+        for (const url of urls) {
+            console.log('Trying R2 URL:', url);
+            const res = await fetch(url, { cache: 'no-cache' });
+            console.log('R2 response:', res.status, res.statusText);
+            if (res.ok) {
+                const json = await res.json();
+                console.log('Loaded from R2:', json);
                 var data = normalizeR2Word(json);
-                console.log(data);
+                console.log('Normalized data:', data);
                 return data;
+            } else {
+                console.log('R2 fetch failed with status:', res.status);
             }
         }
+        console.log('All fetch attempts failed');
         return null;
-    } catch (_) {
+    } catch (error) {
+        console.log('Fetch error:', error);
         return null;
     }
 }
 
 function normalizeR2Word(json) {
-    return {
+    console.log('Normalizing word data:', json);
+    const normalized = {
         word: json.word || '',
         vietnamese: json.vietnamese || '',
         ipa: json.ipa || '',
@@ -126,64 +186,92 @@ function normalizeR2Word(json) {
         image: json.image || null,
         explanations: Array.isArray(json.explanations) ? json.explanations : []
     };
+    console.log('Normalized result:', normalized);
+    return normalized;
 }
 
 // Display word data
 function displayWordData(data) {
-    document.getElementById('englishWord').textContent = data.word;
-    document.getElementById('ipa').textContent = data.ipa;
+    console.log('Displaying word data:', data);
+    
+    const englishWordEl = document.getElementById('englishWord');
+    const ipaEl = document.getElementById('ipa');
+    
+    if (!englishWordEl || !ipaEl) {
+        console.error('Required DOM elements not found:', { englishWordEl, ipaEl });
+        return;
+    }
+    
+    englishWordEl.textContent = data.word;
+    ipaEl.textContent = data.ipa;
 
     // Update QR image source
     const qrImage = document.getElementById('qrImage');
-    qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://e.tway.dev/${encodeURIComponent(data.word.toLowerCase())}`;
+    if (qrImage) {
+        qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=https://e.tway.dev/${encodeURIComponent(data.word.toLowerCase())}`;
+    } else {
+        console.error('QR image element not found');
+    }
 
     // Display explanations dynamically
     const explanationsContainer = document.getElementById('explanations');
-    if (data.explanations && data.explanations.length > 0) {
-        explanationsContainer.innerHTML = data.explanations.map((exp, index) => `
-            <div class="explanation-item">
-                <h4>Tiếng Việt</h4>
-                <p>${exp.vi}</p>
-            </div>
-            <div class="explanation-item">
-                <h4>English</h4>
-                <p>${exp.en}</p>
-            </div>
-        `).join('');
+    if (explanationsContainer) {
+        if (data.explanations && data.explanations.length > 0) {
+            explanationsContainer.innerHTML = data.explanations.map((exp, index) => `
+                <div class="explanation-item">
+                    <h4>Tiếng Việt</h4>
+                    <p>${exp.vi}</p>
+                </div>
+                <div class="explanation-item">
+                    <h4>English</h4>
+                    <p>${exp.en}</p>
+                </div>
+            `).join('');
+        } else {
+            // Fallback to old structure or vietnamese field
+            explanationsContainer.innerHTML = `
+                <div class="explanation-item">
+                    <h4>Tiếng Việt</h4>
+                    <p>${data.vietnamese || ''}</p>
+                </div>
+                <div class="explanation-item">
+                    <h4>English</h4>
+                    <p>${data.explanationEn || data.word || ''}</p>
+                </div>
+            `;
+        }
     } else {
-        // Fallback to old structure or vietnamese field
-        explanationsContainer.innerHTML = `
-            <div class="explanation-item">
-                <h4>Tiếng Việt</h4>
-                <p>${data.vietnamese || ''}</p>
-            </div>
-            <div class="explanation-item">
-                <h4>English</h4>
-                <p>${data.explanationEn || data.word || ''}</p>
-            </div>
-        `;
+        console.error('Explanations container not found');
     }
 
     // Display examples with audio buttons
     const examplesContainer = document.getElementById('examples');
-    examplesContainer.innerHTML = data.examples.map((ex, index) => `
-        <div class="example-item">
-            <strong>${ex.en}</strong><br>
-            ${ex.vi}
-            <div class="example-audio">
-                <button class="example-play-btn" type="button" aria-label="Phát âm câu ví dụ ${index + 1}" title="Phát âm câu ví dụ ${index + 1}" onclick="playExampleAudio('${ex.en}', ${index})">
-                    <div class="example-play-icon"></div>
-                </button>
-                <span style="font-size: 12px; color: #ff9800;">Phát âm câu</span>
+    if (examplesContainer) {
+        examplesContainer.innerHTML = data.examples.map((ex, index) => `
+            <div class="example-item">
+                <strong>${ex.en}</strong><br>
+                ${ex.vi}
+                <div class="example-audio">
+                    <button class="example-play-btn" type="button" aria-label="Phát âm câu ví dụ ${index + 1}" title="Phát âm câu ví dụ ${index + 1}" onclick="playExampleAudio('${ex.en}', ${index})">
+                        <div class="example-play-icon"></div>
+                    </button>
+                    <span style="font-size: 12px; color: #ff9800;">Phát âm câu</span>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `).join('');
+    } else {
+        console.error('Examples container not found');
+    }
 
     // Display related words
     const relatedContainer = document.getElementById('relatedWords');
-    relatedContainer.innerHTML = data.related.map(word => `
-        <span class="tag" onclick="navigateToWord('${word}')">${word}</span>
-    `).join('');
+    if (relatedContainer) {
+        relatedContainer.innerHTML = data.related.map(word => `
+            <span class="tag" onclick="navigateToWord('${word}')">${word}</span>
+        `).join('');
+    } else {
+        console.error('Related words container not found');
+    }
 }
 
 // Show current QR code
@@ -359,9 +447,10 @@ async function playExampleAudio(text, index) {
 }
 
 function navigateToWord(word) {
-    const path = '/' + encodeURIComponent(String(word).toLowerCase());
+    const wordLower = String(word).toLowerCase();
+    const path = '/' + encodeURIComponent(wordLower);
     history.pushState({}, '', path);
-    loadWordData(String(word));
+    loadWordData(wordLower);
 }
 
 // Request new word
@@ -537,24 +626,31 @@ window.stopQrScan = stopQrScan;
 
 // Initialize on load
 window.addEventListener('load', () => {
+    console.log('Window load event fired');
     const wordId = getWordFromUrl();
+    console.log('Initial wordId from load event:', wordId);
     loadWordData(wordId);
 });
 
 // Handle hash changes
 window.addEventListener('hashchange', () => {
+    console.log('Hash change event fired');
     const wordId = getWordFromUrl();
+    console.log('WordId from hash change:', wordId);
     loadWordData(wordId);
 });
 
 // Handle back/forward
 window.addEventListener('popstate', () => {
+    console.log('Popstate event fired');
     const wordId = getWordFromUrl();
+    console.log('WordId from popstate:', wordId);
     loadWordData(wordId);
 });
 
 // Add some fun interactions
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded event fired');
     // Make stars twinkle on click
     document.querySelectorAll('.star').forEach(star => {
         star.style.cursor = 'pointer';
