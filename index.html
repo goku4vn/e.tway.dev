@@ -56,6 +56,11 @@
                     <span class="word-badge">🌟 Từ vựng hôm nay</span>
                     <div class="text-info">
                         <div class="top-row">
+                            <div class="pronunciation">
+                                <button class="play-button" type="button" aria-label="Phát âm từ" title="Phát âm từ" onclick="playSound(event)">
+                                    <div class="play-icon"></div>
+                                </button>
+                            </div>
                             <div class="qr-wrap" id="qrCode" onclick="showCurrentQR()" title="Xem QR code cho đường dẫn hiện tại">
                                 <img id="qrImage" alt="QR Code">
                             </div>
@@ -63,11 +68,6 @@
                                 <div class="english" id="englishWord">Apple</div>
                                 <div class="ipa" id="ipa">/ˈæp.əl/</div>
                             </div>
-                        </div>
-                        <div class="pronunciation">
-                            <button class="play-button" type="button" aria-label="Phát âm từ" title="Phát âm từ" onclick="playSound(event)">
-                                <div class="play-icon"></div>
-                            </button>
                         </div>
                     </div>
                 </div>
