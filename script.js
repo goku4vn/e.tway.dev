@@ -57,6 +57,9 @@ async function loadWordData(wordId) {
         const content = document.getElementById('content');
         const home = document.getElementById('home');
         
+        // Reset SEO to home page
+        resetSEOToHome();
+        
         // Show home intro
         home.classList.remove('hidden');
         loading.classList.add('hidden');
@@ -193,6 +196,9 @@ function normalizeR2Word(json) {
 // Display word data
 function displayWordData(data) {
     console.log('Displaying word data:', data);
+    
+    // Update SEO meta tags dynamically
+    updateSEOMetaTags(data);
     
     const englishWordEl = document.getElementById('englishWord');
     const ipaEl = document.getElementById('ipa');
@@ -601,6 +607,148 @@ displayWordData = function(data) {
     window.currentWordAudioUrl = data.audioUrl || null;
     originalDisplayWordData(data);
 };
+
+// Update SEO meta tags dynamically
+function updateSEOMetaTags(data) {
+    if (!data || !data.word) return;
+    
+    const title = `${data.word} - Từ điển từ vựng tiếng Anh | e.tway.dev (Easy Way to Learn English)`;
+    const description = `e.tway.dev = Easy Way to Learn English! Học từ vựng "${data.word}" với phiên âm IPA, nghĩa tiếng Việt, ví dụ câu và từ liên quan. Từ điển từ vựng tiếng Anh e.tway.dev`;
+    const currentUrl = `https://e.tway.dev/${encodeURIComponent(data.word.toLowerCase())}`;
+    const imageUrl = data.image || `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(currentUrl)}`;
+
+    // Update document title
+    document.title = title;
+    
+    // Update meta description
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', description);
+    
+    // Update Open Graph tags
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    const ogImage = document.querySelector('meta[property="og:image"]');
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    
+    if (ogTitle) ogTitle.setAttribute('content', title);
+    if (ogDesc) ogDesc.setAttribute('content', description);
+    if (ogImage) ogImage.setAttribute('content', imageUrl);
+    if (ogUrl) ogUrl.setAttribute('content', currentUrl);
+    
+    // Update Twitter Card tags
+    const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+    const twitterDesc = document.querySelector('meta[name="twitter:description"]');
+    const twitterImage = document.querySelector('meta[name="twitter:image"]');
+    
+    if (twitterTitle) twitterTitle.setAttribute('content', title);
+    if (twitterDesc) twitterDesc.setAttribute('content', description);
+    if (twitterImage) twitterImage.setAttribute('content', imageUrl);
+    
+    // Update canonical URL
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.setAttribute('href', currentUrl);
+    
+    // Update structured data for vocabulary
+    updateVocabularyStructuredData(data, currentUrl);
+}
+
+// Update structured data for vocabulary words
+function updateVocabularyStructuredData(data, currentUrl) {
+    // Remove existing vocabulary structured data
+    const existingScript = document.querySelector('script[data-vocab-schema]');
+    if (existingScript) {
+        existingScript.remove();
+    }
+    
+    // Create new vocabulary structured data
+    const vocabSchema = {
+        "@context": "https://schema.org",
+        "@type": "CreativeWork",
+        "name": data.word,
+        "description": `Từ vựng tiếng Anh: ${data.word}`,
+        "url": currentUrl,
+        "inLanguage": ["en", "vi"],
+        "genre": "Educational",
+        "educationalLevel": "Beginner",
+        "learningResourceType": "Vocabulary",
+        "teaches": "English Language",
+        "about": {
+            "@type": "Thing",
+            "name": "English Vocabulary"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "e.tway.dev",
+            "url": "https://e.tway.dev"
+        }
+    };
+    
+    // Add explanations if available
+    if (data.explanations && data.explanations.length > 0) {
+        vocabSchema.text = data.explanations.map(exp => exp.vi).join('. ');
+    }
+    
+    // Add examples if available
+    if (data.examples && data.examples.length > 0) {
+        vocabSchema.example = data.examples.map(ex => ({
+            "@type": "CreativeWork",
+            "text": ex.en,
+            "description": ex.vi
+        }));
+    }
+    
+    // Create and append the script tag
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.setAttribute('data-vocab-schema', 'true');
+    script.textContent = JSON.stringify(vocabSchema);
+    document.head.appendChild(script);
+}
+
+// Reset SEO to home page
+function resetSEOToHome() {
+    const homeTitle = 'Learn English - Học Tiếng Anh Vui | e.tway.dev (Easy Way to Learn English)';
+    const homeDescription = 'e.tway.dev = Easy Way to Learn English! Học từ vựng tiếng Anh qua QR code. Quét mã QR dán lên đồ vật để mở trang từ vựng tương ứng với phiên âm IPA, nghĩa tiếng Việt, ví dụ và từ liên quan.';
+    const homeUrl = 'https://e.tway.dev/';
+    const homeImage = 'https://e.tway.dev/og-image.jpg';
+    
+    // Reset document title
+    document.title = homeTitle;
+    
+    // Reset meta description
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', homeDescription);
+    
+    // Reset Open Graph tags
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    const ogImage = document.querySelector('meta[property="og:image"]');
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    
+    if (ogTitle) ogTitle.setAttribute('content', homeTitle);
+    if (ogDesc) ogDesc.setAttribute('content', homeDescription);
+    if (ogImage) ogImage.setAttribute('content', homeImage);
+    if (ogUrl) ogUrl.setAttribute('content', homeUrl);
+    
+    // Reset Twitter Card tags
+    const twitterTitle = document.querySelector('meta[name="twitter:title"]');
+    const twitterDesc = document.querySelector('meta[name="twitter:description"]');
+    const twitterImage = document.querySelector('meta[name="twitter:image"]');
+    
+    if (twitterTitle) twitterTitle.setAttribute('content', homeTitle);
+    if (twitterDesc) twitterTitle.setAttribute('content', homeDescription);
+    if (twitterImage) twitterImage.setAttribute('content', homeImage);
+    
+    // Reset canonical URL
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.setAttribute('href', homeUrl);
+    
+    // Remove vocabulary structured data
+    const existingScript = document.querySelector('script[data-vocab-schema]');
+    if (existingScript) {
+        existingScript.remove();
+    }
+}
 
 // Export functions to global scope for HTML onclick
 window.playSound = playSound;

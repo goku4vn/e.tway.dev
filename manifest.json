@@ -1,0 +1,37 @@
+{
+    "name": "Learn English - Học Tiếng Anh Vui | e.tway.dev",
+    "short_name": "Easy Way",
+    "description": "e.tway.dev = Easy Way to Learn English! Học từ vựng tiếng Anh qua QR code với phiên âm IPA, nghĩa tiếng Việt, ví dụ và từ liên quan",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#4CAF50",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/icons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any"
+        },
+        {
+            "src": "/icons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/icons/icon-384x384.png",
+            "sizes": "384x384",
+            "type": "image/png"
+        },
+        {
+            "src": "/icons/icon-256x256.png",
+            "sizes": "256x256",
+            "type": "image/png"
+        }
+    ],
+    "categories": ["education", "productivity"],
+    "lang": "vi",
+    "dir": "ltr"
+}
