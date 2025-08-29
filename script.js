@@ -231,18 +231,7 @@ function displayWordData(data) {
                 `).join('')}
             `;
         } else {
-            // Fallback to old structure or vietnamese field
-            explanationsContainer.innerHTML = `
-                <h3>Giải thích</h3>
-                <div class="explanation-item">
-                    <h4>Tiếng Việt</h4>
-                    <p>${data.vietnamese || ''}</p>
-                </div>
-                <div class="explanation-item">
-                    <h4>English</h4>
-                    <p>${data.explanationEn || data.word || ''}</p>
-                </div>
-            `;
+            console.error('No explanations found');
         }
     } else {
         console.error('Explanations container not found');
