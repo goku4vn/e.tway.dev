@@ -217,19 +217,23 @@ function displayWordData(data) {
     const explanationsContainer = document.getElementById('explanations');
     if (explanationsContainer) {
         if (data.explanations && data.explanations.length > 0) {
-            explanationsContainer.innerHTML = data.explanations.map((exp, index) => `
-                <div class="explanation-item">
-                    <h4>Tiếng Việt</h4>
-                    <p>${exp.vi}</p>
-                </div>
-                <div class="explanation-item">
-                    <h4>English</h4>
-                    <p>${exp.en}</p>
-                </div>
-            `).join('');
+            explanationsContainer.innerHTML = `
+                <h3>Giải thích</h3>
+                ${data.explanations.map((exp, index) => `
+                    <div class="explanation-item">
+                        <h4>Tiếng Việt</h4>
+                        <p>${exp.vi}</p>
+                    </div>
+                    <div class="explanation-item">
+                        <h4>English</h4>
+                        <p>${exp.en}</p>
+                    </div>
+                `).join('')}
+            `;
         } else {
             // Fallback to old structure or vietnamese field
             explanationsContainer.innerHTML = `
+                <h3>Giải thích</h3>
                 <div class="explanation-item">
                     <h4>Tiếng Việt</h4>
                     <p>${data.vietnamese || ''}</p>
